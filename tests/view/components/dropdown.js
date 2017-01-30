@@ -55,6 +55,26 @@ describe('Dropdown component tests', () => {
     return enzymeWrapper;
   }
 
+  it('state data loads from props options', () => {
+    const ARR = [DUMMY_STRING];
+    const enzymeWrapper = setup({ options: ARR });
+    const instance = enzymeWrapper.instance();
+    expect(instance.state.data.length).to.equal(ONE);
+    expect(instance.state.data).to.deep.equal(ARR);
+  });
+
+  it('given an array of single element, render single item', () => {
+    const enzymeWrapper = setup({ options: [DUMMY_STRING] });
+    const instance = enzymeWrapper.instance();
+    // change to open state, to show dropdown
+    instance.setState({ open: true });
+    expect(enzymeWrapper.find('.slds-media')).to.have.length(ONE);
+  });
+
+  it('on props showEditIcon true, render pencil icon');
+  it('by default showEditIcon is false');
+  it('on showEditIcon is false, no pencil icon is rendered');
+
   it('on toggle true, dropdown opens', () => {
     const enzymeWrapper = setup();
     const instance = enzymeWrapper.instance();

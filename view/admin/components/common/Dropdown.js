@@ -74,11 +74,12 @@ class Dropdown extends React.Component {
     super(props);
     this.state = {
       open: false, // dropdown is open or closed
-      data: [], // data in dropdown
+      data: props.options, // data in dropdown
       highlightedIndex: getIndexFromArray(props.options, props. defaultValue),
     };
     this.toggle = this.toggle.bind(this);
   }
+
   componentDidMount() {
     // click anywhere outside of container
     // to hide dropdown
@@ -100,6 +101,7 @@ class Dropdown extends React.Component {
       open: bool,
     });
   }
+
   handleFocus() {
     // show all options
     this.setState({
@@ -107,6 +109,7 @@ class Dropdown extends React.Component {
       data: this.props.options,
     });
   }
+
   handleKeyUp(evt) {
     const Key = {
       UP: 38,
@@ -160,6 +163,7 @@ class Dropdown extends React.Component {
   }
   render () {
     const {
+      options,
       newButtonText,
       dropDownStyle,
       allOptionsLabel,
@@ -168,9 +172,12 @@ class Dropdown extends React.Component {
       showSearchIcon,
       onAddNewButton,
       onClickItem,
+      onEdit,
       showInputElem,
       children, // react elements
       defaultValue,
+      showEditIcon,
+      renderAsLink, //boolean
     } = this.props;
     const { data } = this.state;
     let outputUL = '';
@@ -183,22 +190,40 @@ class Dropdown extends React.Component {
           if (index === this.state.highlightedIndex) {
             className += ' highlighted';
           }
-          return (
-            <li key={ optionsName }
-                onClick={ onClickItem }
-                className={ className }>
-                <svg aria-hidden='true'
-                  className={'slds-icon slds-icon-standard-account' +
-                    ' slds-icon--small slds-media__figure'}>
-                  <use xlinkHref={'../static/icons/custom-sprite' +
-                    '/svg/symbols.svg#custom39'}></use>
-                </svg>
-              <a href= { optionsName }>
-                { optionsName }
-              </a>
-            </li>
-          );
-        }
+          const itemOutput = !renderAsLink ? optionsName : <a
+            href= { optionsName }>
+            { optionsName }
+          </a>;
+          const defaultListItem = <li key={ optionsName + index }
+          onClick={ onClickItem }
+          className={ className }>
+            <svg aria-hidden='true'
+              className={'slds-icon slds-icon-standard-account' +
+                ' slds-icon--small slds-media__figure'}>
+              <use xlinkHref={'../static/icons/custom-sprite' +
+                '/svg/symbols.svg#custom39'}></use>
+              </svg>
+              { itemOutput }
+          </li>;
+          // if is editing, show the edit icons on right
+          // else show the list items only
+          return !showEditIcon ? defaultListItem :
+            <section className="slds-clearfix">
+              <div className="slds-float--left">
+              { defaultListItem }
+              </div>
+              <div className="slds-float--right">
+                <button onClick={ onEdit.bind(null, optionsName) }
+                  className="slds-button slds-button--icon-border slds-align-right"
+                  title="Edit">
+                  <svg className="slds-button__icon" aria-hidden="true">
+                    <use xlinkHref="../static/icons/utility-sprite/svg/symbols.svg#edit"></use>
+                  </svg>
+                  <span className="slds-assistive-text">Edit</span>
+                </button>
+              </div>
+            </section>;
+          }
         )}
       </ul>;
     }
@@ -281,11 +306,13 @@ Dropdown.propTypes = {
   placeholderText: PropTypes.string,
   defaultValue: PropTypes.string,
   onAddNewButton: PropTypes.func,
+  onEdit: PropTypes.func,
   onClickItem: PropTypes.func.isRequired,
   children: PropTypes.element,
   showSearchIcon: PropTypes.bool,
   showInputElem: PropTypes.bool,
   close: PropTypes.bool, // if true, close dropdown
+  renderAsLink: PropTypes.bool, // render list item as link
 };
 
 export default Dropdown;
